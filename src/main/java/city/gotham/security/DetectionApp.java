@@ -23,8 +23,8 @@ public class DetectionApp {
 
         logger.info("Properties created...");
 
-        KafkaStreamsBuilder builder = new KafkaStreamsBuilder(config, "test");
-        KafkaStreams streams = builder.getKafkaStreams();
+        KafkaStreamBuilder kafkaStreamBuilder = new KafkaStreamBuilder(config, "test");
+        KafkaStreams streams = kafkaStreamBuilder.getKafkaStreams();
         streams.start();
     }
 
