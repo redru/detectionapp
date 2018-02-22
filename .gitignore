@@ -1,0 +1,6 @@
+# Compiled
+target/
+
+# Intellij IDEA
+.idea/
+*.iml
