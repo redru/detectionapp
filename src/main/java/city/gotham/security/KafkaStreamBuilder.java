@@ -5,71 +5,83 @@ import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.Consumed;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
+import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Produced;
+import org.apache.kafka.streams.kstream.ValueMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
+import java.util.function.Consumer;
 
 public class KafkaStreamBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(KafkaStreamBuilder.class);
 
     private Properties config;
-    private String topic;
+    private String inputTopic;
+    private String outputTopic;
 
     private StreamsBuilder builder;
 
-    KafkaStreamBuilder(final Properties config, String topic) {
+    KafkaStreamBuilder(final Properties config, final String inputTopic, final String outputTopic) throws NullPointerException {
         this.config = config;
-        this.topic = "".equals(topic) ? "test" : topic;
+        this.inputTopic = "".equals(inputTopic) ? "test" : inputTopic;
+        this.outputTopic = "".equals(outputTopic) ? "test-output" : outputTopic;
 
-        /*builder = new StreamsBuilder();
-        KStream<String, String> textLines = builder.stream(topic);
-        KTable<String, Long> wordCounts = textLines
-                .flatMapValues(textLine -> Arrays.asList(textLine.toLowerCase().split("\\W+")))
-                .groupBy((key, word) -> word)
-                .count(*//*Materialized.<String, Long, KeyValueStore<Bytes, byte[]>>as("counts-store")*//*);
-        wordCounts.toStream().to(topic, Produced.with(Serdes.String(), Serdes.Long()));*/
+        if (this.config == null) {
+            throw new NullPointerException("config object cannot be null");
+        }
 
-        // Serializers/deserializers (serde) for String and Long types
-        final Serde<String> stringSerde = Serdes.String();
-        final Serde<Long> longSerde = Serdes.Long();
-
-        // Construct a `KStream` from the input topic "streams-plaintext-input", where message values
-        // represent lines of text (for the sake of this example, we ignore whatever may be stored
-        // in the message keys).
         builder = new StreamsBuilder();
-        KStream<String, String> textLines = builder.stream(topic,
-                Consumed.with(stringSerde, stringSerde));
 
-        KTable<String, Long> wordCounts = textLines
-                // Split each text line, by whitespace, into words.
-                .flatMapValues(value -> Arrays.asList(value.toLowerCase().split("\\W+")))
+        KStream<String, String> source = builder.stream(this.inputTopic);
+        source.flatMapValues(new ValueMapper<String, Iterable<String>>() {
 
-                // Group the text words as message keys
-                .groupBy((key, value) -> value)
+            @Override
+            public Iterable<String> apply(String value) {
+                List<String> result = new ArrayList<>();
+                Iterable<String> words = Arrays.asList(value.split("\\W+"));
 
-                // Count the occurrences of each word (message key).
-                .count();
+                words.forEach(new Consumer<String>() {
 
-        // Store the running counts as a changelog stream to the output topic.
-        wordCounts.toStream().to(topic, Produced.with(stringSerde, longSerde));
+                    @Override
+                    public void accept(String o) {
+                        if ("abc".equals(o)) {
+                            result.add(o);
+                        }
+                    }
+
+                });
+
+                return result;
+            }
+
+        }).to(this.outputTopic);
     }
 
     public KafkaStreams getKafkaStreams() {
-        return new KafkaStreams(builder.build(), config);
-    }
+        Topology topology = builder.build();
+        logger.info(topology.describe().toString());
 
-    public void setConfig(final Properties config) {
-        this.config = config;
+        return new KafkaStreams(topology, config);
     }
 
     public Properties getConfig() {
         return config;
+    }
+
+    public String getInputTopic() {
+        return inputTopic;
+    }
+
+    public String getOutputTopic() {
+        return outputTopic;
     }
 
 }
