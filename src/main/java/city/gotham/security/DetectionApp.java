@@ -1,5 +1,6 @@
 package city.gotham.security;
 
+import city.gotham.security.dags.LoginFailsDag;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsConfig;
@@ -21,11 +22,11 @@ public class DetectionApp {
         config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
 
-        logger.info("Properties created...");
-
-        KafkaStreamBuilder kafkaStreamBuilder = new KafkaStreamBuilder(config, "login-topic", "login-failure-topic");
-        KafkaStreams streams = kafkaStreamBuilder.getKafkaStreams();
+        LoginFailsDag loginFailsDag = new LoginFailsDag(config);
+        KafkaStreams streams = loginFailsDag.getStreams();
         streams.start();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
     }
 
 }

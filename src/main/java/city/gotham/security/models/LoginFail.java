@@ -2,7 +2,7 @@ package city.gotham.security.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class LoginFailEntry {
+public class LoginFail {
 
     @JsonProperty("userID")
     private String userId;
