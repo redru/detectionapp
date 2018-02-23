@@ -48,7 +48,7 @@ public class LoginFailsDag {
         streams = new KafkaStreams(topology, config);
 
         streams.setUncaughtExceptionHandler((Thread thread, Throwable throwable) -> {
-            logger.error("A REALLY BAD ERROR OCCURRED");
+            throwable.printStackTrace();
         });
     }
 
