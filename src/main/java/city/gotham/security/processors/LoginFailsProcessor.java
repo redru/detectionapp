@@ -2,6 +2,7 @@ package city.gotham.security.processors;
 
 import city.gotham.security.models.Login;
 import city.gotham.security.models.LoginFail;
+import city.gotham.security.services.LocalMailService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.streams.processor.AbstractProcessor;
@@ -89,6 +90,9 @@ public class LoginFailsProcessor extends AbstractProcessor<String, Login> {
                 loginFail.setMessage("User failed logging in " + userCount + " times");
 
                 this.context.forward(key, mapper.writeValueAsString(loginFail));
+
+                // Send mail with the notification
+                LocalMailService.getInstance().sendMail();
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             } finally {
