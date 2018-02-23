@@ -14,6 +14,11 @@ public class LoginFailsProcessor extends AbstractProcessor<String, Login> {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginFailsProcessor.class);
 
+    private static final int LOGIN_FAILS_LIMIT = 4;
+
+    public static final String LOGIN_FAILS_PROCESSOR_NAME = "LOGIN_FAILS_PROCESSOR";
+    public static final String LOGIN_FAILS_STORE_NAME = "LoginFailsStore";
+
     private ProcessorContext context;
     private ObjectMapper mapper;
     private KeyValueStore<String, Integer> loginFailsStore;
@@ -23,38 +28,16 @@ public class LoginFailsProcessor extends AbstractProcessor<String, Login> {
     public void init(ProcessorContext context) {
         this.context = context;
         mapper = new ObjectMapper();
-        loginFailsStore = (KeyValueStore<String, Integer>) this.context.getStateStore("LoginFailsStore");
+        loginFailsStore = (KeyValueStore<String, Integer>) this.context.getStateStore(LoginFailsProcessor.LOGIN_FAILS_STORE_NAME);
     }
 
     @Override
     public void process(String key, Login login) {
-        // Get current user login fails count
-        Integer userCount = getUserFailsCount(login);
-
-        // Reset user count and return if login has succeeded
+        // Reset user count if login has succeeded
         if ("success".equals(login.getStatus())) {
-            loginFailsStore.put(login.getUserId(), 0);
-            logger.info("User " + login.getUserId() + " correctly logged in at " + login.getLogTime() + " so counter was reset from " + userCount);
-            return;
-        }
-
-        if (userCount + 1 >= 4) {
-            try {
-                logger.info("User " + login.getUserId() + " failed logging in at " + login.getLogTime() + ". A notification will be sent");
-
-                LoginFail loginFail = new LoginFail();
-                loginFail.setUserId(login.getUserId());
-                loginFail.setMessage("User failed logging in 4 times");
-
-                this.context.forward(key, mapper.writeValueAsString(loginFail));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            } finally {
-                loginFailsStore.put(login.getUserId(), 0);
-            }
+            processSuccess(login);
         } else {
-            loginFailsStore.put(login.getUserId(), userCount + 1);
-            logger.info("User " + login.getUserId() + " failed logging in at " + login.getLogTime() + ". Current count: " + (userCount + 1));
+            processFailure(key, login);
         }
 
         this.context.commit();
@@ -65,7 +48,7 @@ public class LoginFailsProcessor extends AbstractProcessor<String, Login> {
      * @param login
      * @return Integer
      */
-    private Integer getUserFailsCount(Login login) {
+    private Integer getUserFailsCountFromStore(Login login) {
         Integer userCount = loginFailsStore.get(login.getUserId());
 
         if (userCount == null) {
@@ -73,6 +56,48 @@ public class LoginFailsProcessor extends AbstractProcessor<String, Login> {
         }
 
         return userCount;
+    }
+
+    /**
+     * This function processes successful logins. It resets counter and logs to stdout the success.
+     * @param login
+     */
+    private void processSuccess(Login login) {
+        logger.info("User " + login.getUserId() + " correctly logged in at " + login.getLogTime() + " so counter was reset from " + getUserFailsCountFromStore(login));
+        loginFailsStore.put(login.getUserId(), 0);
+    }
+
+    /**
+     * This function processes failed logins. It increments the counter of the user and if
+     * the counter is higher than limit, sends a notification and then resets the counter.
+     * @param key
+     * @param login
+     */
+    private void processFailure(String key, Login login) {
+        // Get current user failures count and add 1 because we know
+        // that this function is handling failed login
+        Integer userCount = getUserFailsCountFromStore(login) + 1;
+
+        // If count has exceeded limit, reset and add to the queue a login fail message to commit
+        // to the next topic. Else increment counter.
+        if (userCount >= LoginFailsProcessor.LOGIN_FAILS_LIMIT) {
+            try {
+                logger.info("User " + login.getUserId() + " failed logging in for " + userCount + " times, last time at " + login.getLogTime() + ". A notification will be sent");
+
+                LoginFail loginFail = new LoginFail();
+                loginFail.setUserId(login.getUserId());
+                loginFail.setMessage("User failed logging in " + userCount + " times");
+
+                this.context.forward(key, mapper.writeValueAsString(loginFail));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            } finally {
+                loginFailsStore.put(login.getUserId(), 0);
+            }
+        } else {
+            loginFailsStore.put(login.getUserId(), userCount);
+            logger.info("User " + login.getUserId() + " failed logging in at " + login.getLogTime() + ". Current count: " + (userCount));
+        }
     }
 
 }

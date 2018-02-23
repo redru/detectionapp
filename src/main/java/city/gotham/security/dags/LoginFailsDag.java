@@ -25,31 +25,36 @@ public class LoginFailsDag {
     private KafkaStreams streams;
 
     public LoginFailsDag(Properties config) {
+        logger.info("Creating LoginFailsDag...");
         this.config = config;
 
+        ObjectMapper mapper = new ObjectMapper();
+
         Topology topology = new Topology();
-        topology.addSource("SOURCE", new StringDeserializer(), new KafkaJacksonDeserializer<>(new ObjectMapper(), Login.class), LoginFailsDag.SOURCE_TOPIC)
+        topology.addSource("SOURCE", new StringDeserializer(), new KafkaJacksonDeserializer<>(mapper, Login.class), LoginFailsDag.SOURCE_TOPIC)
 
                 // State stores creation
                 .addStateStore(Stores.keyValueStoreBuilder(
-                        Stores.persistentKeyValueStore("LoginFailsStore"),
+                        Stores.persistentKeyValueStore(LoginFailsProcessor.LOGIN_FAILS_STORE_NAME),
                         Serdes.String(),
                         Serdes.Integer()))
 
                 // Processors
-                .addProcessor("LOGIN_FAILS_PROCESSOR", LoginFailsProcessor::new, "SOURCE")
+                .addProcessor(LoginFailsProcessor.LOGIN_FAILS_PROCESSOR_NAME, LoginFailsProcessor::new, "SOURCE")
 
                 // Sinks
-                .addSink("SINK", LoginFailsDag.OUTPUT_TOPIC, new StringSerializer(), new KafkaJacksonSerializer(new ObjectMapper()), "LOGIN_FAILS_PROCESSOR")
+                .addSink("SINK", LoginFailsDag.OUTPUT_TOPIC, new StringSerializer(), new KafkaJacksonSerializer(mapper), LoginFailsProcessor.LOGIN_FAILS_PROCESSOR_NAME)
 
                 // State stores + processor connection
-                .connectProcessorAndStateStores("LOGIN_FAILS_PROCESSOR", "LoginFailsStore");
+                .connectProcessorAndStateStores(LoginFailsProcessor.LOGIN_FAILS_PROCESSOR_NAME, LoginFailsProcessor.LOGIN_FAILS_STORE_NAME);
 
         streams = new KafkaStreams(topology, config);
 
         streams.setUncaughtExceptionHandler((Thread thread, Throwable throwable) -> {
             throwable.printStackTrace();
         });
+
+        logger.info("Created LoginFailsDag...");
     }
 
     public KafkaStreams getStreams() {
