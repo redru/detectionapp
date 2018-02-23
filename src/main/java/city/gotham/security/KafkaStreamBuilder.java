@@ -3,14 +3,12 @@ package city.gotham.security;
 import city.gotham.security.processors.LoginProcessor;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
-import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.state.Stores;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 public class KafkaStreamBuilder {
 
@@ -22,7 +20,7 @@ public class KafkaStreamBuilder {
 
     private Topology topology;
 
-    KafkaStreamBuilder(final Properties config, final String inputTopic, final String outputTopic) throws NullPointerException {
+    KafkaStreamBuilder(Properties config, String inputTopic, String outputTopic) throws NullPointerException {
         this.config = config;
         this.inputTopic = "".equals(inputTopic) ? "test" : inputTopic;
         this.outputTopic = "".equals(outputTopic) ? "test-output" : outputTopic;
