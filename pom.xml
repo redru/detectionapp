@@ -55,11 +55,6 @@
             <artifactId>kafka-streams</artifactId>
             <version>1.0.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.github.daniel-shuy</groupId>
-            <artifactId>kafka-jackson-serializer</artifactId>
-            <version>0.1.2</version>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.kafka/connect-json -->
         <dependency>
             <groupId>org.apache.kafka</groupId>
@@ -83,6 +78,11 @@
             <groupId>com.sun.mail</groupId>
             <artifactId>javax.mail</artifactId>
             <version>1.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+            <version>2.1.2.RELEASE</version>
         </dependency>
     </dependencies>
 

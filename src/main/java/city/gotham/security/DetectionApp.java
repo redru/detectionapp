@@ -16,9 +16,11 @@ public class DetectionApp {
     public static void main(String[] args) {
         logger.info("Starting service...");
 
+        ApplicationProperties applicationProperties = ApplicationProperties.getInstance();
+
         Properties config = new Properties();
-        config.put(StreamsConfig.APPLICATION_ID_CONFIG, "detection-app");
-        config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "DESKTOP-4GK2USK:9092");
+        config.put(StreamsConfig.APPLICATION_ID_CONFIG, applicationProperties.getApplicationId());
+        config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, applicationProperties.getBootstrapServers());
         config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
 

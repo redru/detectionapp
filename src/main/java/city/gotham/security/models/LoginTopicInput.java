@@ -2,7 +2,7 @@ package city.gotham.security.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Login {
+public class LoginTopicInput {
 
     @JsonProperty("logTime")
     private String logTime;
