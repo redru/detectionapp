@@ -10,7 +10,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-app.use('/', express.static('./app'));
+app.use('/', express.static('./build'));
 
 const server = http.createServer(app);
 
