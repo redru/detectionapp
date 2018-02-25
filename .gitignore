@@ -1,6 +1,11 @@
 # Compiled
 target/
+build/
 
 # Intellij IDEA
 .idea/
 *.iml
+
+# NPM
+node_modules/
+package-lock.json
