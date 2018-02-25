@@ -1,5 +1,6 @@
 "use strict";
 const http = require('http');
+const path = require('path');
 const kafka = require('kafka-node');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -13,7 +14,7 @@ const consumer = new kafka.Consumer(client, [{ topic: 'login-topic', offset: 0 }
 const loginTopicRows = [];
 
 consumer.on('message', message => {
-    // loginTopicRows.push(JSON.parse(message.value));
+    loginTopicRows.push(JSON.parse(message.value));
     message = JSON.parse(message.value);
 
     sockets.forEach(socket => socket.emit('new-login', message));
@@ -37,7 +38,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
-app.use('/', express.static('./build'));
+app.use('/', express.static(path.join(__dirname, '/build')));
 
 app.post('/login', (req, res) => {
     const now = new Date();
