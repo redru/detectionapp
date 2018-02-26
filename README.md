@@ -18,7 +18,7 @@ Structure
 ---------
 Project is composed by two modules:
 - __kafkaprocessor (Java)__: Java project handling streams
-- __kafkaclient (Node.js + React + Socket.io)__: client written in Node.js that makes easy enter expected data for kafkaprocessor  
+- __kafkaclient (Node.js + React + Socket.io)__: client written in Node.js that makes easy putting expected data into kafka server for kafkaprocessor  
   
 Modules can be built together executing __mvn clean package__ from the root folder __../detectionapp/__ ; the build is automated so there is no need to install node or npm or any other tool than Maven (plugins will handle locally install Node.js to build the kafkaclient project).  
   
@@ -26,6 +26,9 @@ Modules can also be built separately entering the __../detectionapp/<module_root
 
 Configuration
 -------------
+### kafka server
+Create 2 topics 
+
 ### kafkaprocessor
 Before building the project, the file __../detectionapp/kafkaprocessor/src/main/resources/config.properties__ must be filled with correct parameters:
 - __APPLICATION_ID__: application id (default: detection-app)
@@ -43,3 +46,6 @@ Before building the project, the file __../detectionapp/kafkaprocessor/src/main/
 
 Installation
 ------------
+### kafkaprocessor
+
+Work in progress
