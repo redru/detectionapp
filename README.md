@@ -10,6 +10,7 @@ index
 
 Prerequisites
 -------------
+- Kafka 1.0.0
 - Maven 3.x
 - JDK 1.8
 - Node.js 8.9.x
@@ -41,13 +42,25 @@ Before building the project, the file __../detectionapp/kafkaprocessor/src/main/
 - __SMTP_PASSWORD__: smtp password
 - __SMTP_START_TLS_ENABLE__: tls enable flag (default: true)
 - __TARGET_EMAIL__: target email that will receive the alert
-- __STREAM_LOGIN_FAILS_SOURCE_TOPIC__: input topic (default: login-topic - DO NOT CHANGE IT)
-- __STREAM_LOGIN_FAILS_OUTPUT_TOPIC__: output topic (default: login-failure-topic - DO NOT CHANGE IT)
+- __STREAM_LOGIN_FAILS_SOURCE_TOPIC__: input topic (default: login-topic - preferred NOT to change it)
+- __STREAM_LOGIN_FAILS_OUTPUT_TOPIC__: output topic (default: login-failure-topic - preferred NOT to change it)
 
 ### kafkaclient
+Before building the project, the file __../detectionapp/kafkaclient/src/main/resources/kafka-client/config.js__ must be filled with correct parameters:
+- __port__: application port (default: 8080)
+- __bootstrap_servers__: kafka bootstrap servers
+- __stream_login_fails_source_topic__: input topic (default: login-topic - preferred NOT to change it)
+- __stream_login_fails_output_topic__: output topic (default: login-failure-topic - preferred NOT to change it)
 
 Installation
 ------------
-### kafkaprocessor
+### kafka server
+Two topics must be created. Preferred names are:
+- login-topic
+- login-failure-topic
 
-Work in progress
+### kafkaprocessor
+Run __java -jar ../detectionapp/kafkaprocessor/target/kafka-processor-0.0.1-jar-with-dependencies.jar__
+
+### kafkaclient
+Run __node ../detectionapp/kafkaclient/target/kafka-client/server.js__
