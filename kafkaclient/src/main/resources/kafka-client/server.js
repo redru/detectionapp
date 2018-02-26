@@ -54,6 +54,8 @@ const server = http.createServer(app);
 KafkaSocket.setServer(server);
 
 // SERVER STARTUP
-server.listen(8080, () => {
-    console.log('Listening at http://localhost:8080');
+_configuration.port = _configuration.port || 8080;
+
+server.listen(_configuration.port, () => {
+    console.log(`Listening at http://localhost:${_configuration.port}`);
 });
