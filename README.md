@@ -6,21 +6,21 @@ Project made by two parts:
 
 NOTE: kafkaprocessor can run alone, it is completely independant from client module
 
-index
+INDEX
 -----
 1) Prerequisites
 2) Structure
 3) Configuration
 4) Installation
 
-Prerequisites
+PREREQUISITES
 -------------
 - Kafka 1.0.0
 - Maven 3.x
 - JDK 1.8
 - Node.js 8.9.x
 
-Structure
+STRUCTURE
 ---------
 Project is composed by two modules:
 - __kafkaprocessor (Java)__: Java project handling streams
@@ -30,7 +30,7 @@ Modules can be built together executing __mvn clean package__ from the root fold
   
 Modules can also be built separately entering the __../detectionapp/<module_root_folder>__ and executing __mvn clean package__
 
-Configuration
+CONFIGURATION
 -------------
 ### kafka server
 Create 2 topics with same name as parameter __STREAM_LOGIN_FAILS_SOURCE_TOPIC__ and __STREAM_LOGIN_FAILS_OUTPUT_TOPIC__ . Recomended is NOT to change names, so topics would be:
@@ -57,7 +57,7 @@ Before building the project, the file __../detectionapp/kafkaclient/src/main/res
 - __stream_login_fails_source_topic__: input topic (default: login-topic - preferred NOT to change it) [must match 'STREAM_LOGIN_FAILS_SOURCE_TOPIC']
 - __stream_login_fails_output_topic__: output topic (default: login-failure-topic - preferred NOT to change it) [must match 'STREAM_LOGIN_FAILS_OUTPUT_TOPIC']
 
-Installation
+INSTALLATION
 ------------
 ### kafka server
 Two topics must be created. Preferred names are:
