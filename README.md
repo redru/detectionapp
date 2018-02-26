@@ -27,7 +27,9 @@ Modules can also be built separately entering the __../detectionapp/<module_root
 Configuration
 -------------
 ### kafka server
-Create 2 topics 
+Create 2 topics with same name as parameter __STREAM_LOGIN_FAILS_SOURCE_TOPIC__ and __STREAM_LOGIN_FAILS_OUTPUT_TOPIC__ . Recomended is NOT to change names, so topics would be:
+- login-topic
+- login-failure-topic
 
 ### kafkaprocessor
 Before building the project, the file __../detectionapp/kafkaprocessor/src/main/resources/config.properties__ must be filled with correct parameters:
