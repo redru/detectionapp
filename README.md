@@ -42,15 +42,15 @@ Before building the project, the file __../detectionapp/kafkaprocessor/src/main/
 - __SMTP_PASSWORD__: smtp password
 - __SMTP_START_TLS_ENABLE__: tls enable flag (default: true)
 - __TARGET_EMAIL__: target email that will receive the alert
-- __STREAM_LOGIN_FAILS_SOURCE_TOPIC__: input topic (default: login-topic - preferred NOT to change it)
-- __STREAM_LOGIN_FAILS_OUTPUT_TOPIC__: output topic (default: login-failure-topic - preferred NOT to change it)
+- __STREAM_LOGIN_FAILS_SOURCE_TOPIC__: input topic (default: login-topic - preferred NOT to change it) [must match 'stream_login_fails_source_topic']
+- __STREAM_LOGIN_FAILS_OUTPUT_TOPIC__: output topic (default: login-failure-topic - preferred NOT to change it) [must match 'stream_login_fails_output_topic']
 
 ### kafkaclient
 Before building the project, the file __../detectionapp/kafkaclient/src/main/resources/kafka-client/config.js__ must be filled with correct parameters:
 - __port__: application port (default: 8080)
 - __bootstrap_servers__: kafka bootstrap servers
-- __stream_login_fails_source_topic__: input topic (default: login-topic - preferred NOT to change it)
-- __stream_login_fails_output_topic__: output topic (default: login-failure-topic - preferred NOT to change it)
+- __stream_login_fails_source_topic__: input topic (default: login-topic - preferred NOT to change it) [must match 'STREAM_LOGIN_FAILS_SOURCE_TOPIC']
+- __stream_login_fails_output_topic__: output topic (default: login-failure-topic - preferred NOT to change it) [must match 'STREAM_LOGIN_FAILS_OUTPUT_TOPIC']
 
 Installation
 ------------
