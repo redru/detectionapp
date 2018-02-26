@@ -17,5 +17,5 @@ Prerequisites
 Project Structure
 -----------------
 Project is composed by two modules:
-- kafkaprocessor: Java project handling streams
-- kafkaclient: client written in Node.js that makes easy enter expected data for kafkaprocessor
+- __kafkaprocessor (Java)__: Java project handling streams
+- __kafkaclient (Node.js + React + Socket.io)__: client written in Node.js that makes easy enter expected data for kafkaprocessor
