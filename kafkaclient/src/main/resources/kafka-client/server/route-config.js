@@ -1,12 +1,15 @@
 "use strict";
 const KafkaManager = require('./kafka-manager');
 
+/**
+ * This class is mainly used to configure the few routes of the application
+ */
 class RouteConfig {
 
     constructor() { }
 
     /**
-     *
+     * Being only 2 routes, I am putting all inside this function
      * @param {Object} app
      */
     configure(app) {

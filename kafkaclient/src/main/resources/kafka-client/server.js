@@ -43,6 +43,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
+// Static pages
 app.use('/', express.static(path.join(__dirname, '/build')));
 
 // Configure application routes
