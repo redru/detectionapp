@@ -11,7 +11,7 @@ INDEX
 1) Prerequisites
 2) Structure
 3) Configuration
-4) Installation
+4) Running
 
 PREREQUISITES
 -------------
@@ -57,12 +57,10 @@ Before building the project, the file __../detectionapp/kafkaclient/src/main/res
 - __stream_login_fails_source_topic__: input topic (default: login-topic - preferred NOT to change it) [must match 'STREAM_LOGIN_FAILS_SOURCE_TOPIC']
 - __stream_login_fails_output_topic__: output topic (default: login-failure-topic - preferred NOT to change it) [must match 'STREAM_LOGIN_FAILS_OUTPUT_TOPIC']
 
-INSTALLATION
+RUNNING
 ------------
 ### kafka server
-Two topics must be created. Preferred names are:
-- login-topic
-- login-failure-topic
+An instance of kafka server must be configured and running
 
 ### kafkaprocessor
 Run __java -jar ../detectionapp/kafkaprocessor/target/kafka-processor-0.0.1-jar-with-dependencies.jar__
