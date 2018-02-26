@@ -38,7 +38,7 @@ Create 2 topics with same name as parameter __STREAM_LOGIN_FAILS_SOURCE_TOPIC__ 
 - login-failure-topic
 
 ### kafkaprocessor
-Before building the project, the file __../detectionapp/kafkaprocessor/src/main/resources/config.properties__ must be filled with correct parameters:
+Before building the project, the file __../detectionapp/kafkaprocessor/src/main/resources/config.properties__ must be filled with correct parameters (SMTP fields can be empty, the application will just fail when trying to send the email, but the exception is handled):
 - __APPLICATION_ID__: application id (default: detection-app)
 - __BOOTSTRAP_SERVERS__: kafka bootstrap servers
 - __SMTP_HOST__: smtp host from where the alert email will be sent (default: smtp-mail.outlook.com)
