@@ -38,10 +38,10 @@ class App extends Component {
             url: '/login',
             dataType: 'json',
             data: { user: this.user.value, status: this.status.value }
-        }).done(() => {
-
-        }).fail(() => {
-            alert('error');
+        }).done(data => {
+            console.log(`Correctly submitted new login to queue: ${JSON.stringify(data)}`);
+        }).fail(response => {
+            console.log(response.responseJSON);
         });
 
         event.preventDefault();
@@ -61,7 +61,7 @@ class App extends Component {
                         <input type="submit" value="Login" />
                     </form>
                 </header>
-                <p className="App-intro">
+                <div className="App-intro">
                     <div id="loginTopicList" className="topic-list">
                         <h3>Login Topic</h3>
                         <ul>
@@ -74,7 +74,7 @@ class App extends Component {
                             {this.state.loginFailureTopicRows.map(this.renderLoginFailureTopicRows)}
                         </ul>
                     </div>
-                </p>
+                </div>
             </div>
         );
     }
