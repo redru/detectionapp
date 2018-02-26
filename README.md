@@ -1,5 +1,10 @@
 detectionapp
 ============
+Project made by two parts:
+- backend (kafkaprocessor) in Java handling login events and registering / sending alerts when 4 consecutive logins fail;
+- frontend (kafkaclient) in Node.js + React + Socket.io to produce events on kafka server that will be used by kafkaprocessor
+
+NOTE: kafkaprocessor can run alone, it is completely independant from client module
 
 index
 -----
