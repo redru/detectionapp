@@ -49,7 +49,7 @@ public class LocalMailService {
                 message.setContent(template, "text/html; charset=utf-8");
 
                 Transport.send(message);
-                LOGGER.info("An email has been correctly sent to " + String.join(" ", mailData.getTo()));
+                LOGGER.info("An email has been correctly sent to " + mailData.getTo());
                 return true;
             } catch (MessagingException e) {
                 e.printStackTrace();
