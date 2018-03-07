@@ -8,6 +8,7 @@ import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Properties;
+import java.util.concurrent.FutureTask;
 
 public class LocalMailService {
 
@@ -34,11 +35,10 @@ public class LocalMailService {
                         return new PasswordAuthentication(applicationProperties.getSmtpUsername(), applicationProperties.getSmtpPassword());
                     }
                 });
-
     }
 
-    public void sendMail(String template) {
-        new Thread(() -> {
+    public boolean sendMail(String template) {
+        /*new Thread(() -> {
             try {
                 Message message = new MimeMessage(session);
                 message.setFrom(new InternetAddress(applicationProperties.getSmtpUsername()));
@@ -52,7 +52,22 @@ public class LocalMailService {
             } catch (MessagingException e) {
                 throw new RuntimeException(e);
             }
-        }).start();
+        }).start();*/
+        try {
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(applicationProperties.getSmtpUsername()));
+            message.setRecipients(Message.RecipientType.TO,
+                    InternetAddress.parse(applicationProperties.getTargetEmail()));
+            message.setSubject("[Gotham Security] Alert Service");
+            message.setContent(template, "text/html; charset=utf-8");
+
+            Transport.send(message);
+            logger.info("An email has been correctly sent to " + applicationProperties.getTargetEmail());
+            return true;
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public static LocalMailService getInstance() {
