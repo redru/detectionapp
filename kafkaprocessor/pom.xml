@@ -94,6 +94,13 @@
             <artifactId>junit</artifactId>
             <version>4.12</version>
             <scope>test</scope>
+        </dependency>-->
+        <!-- https://mvnrepository.com/artifact/com.github.charithe/kafka-junit -->
+        <dependency>
+            <groupId>com.github.charithe</groupId>
+            <artifactId>kafka-junit</artifactId>
+            <version>4.1.0</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
