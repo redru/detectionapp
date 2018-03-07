@@ -32,11 +32,12 @@ public class ApplicationProperties {
 
             applicationId = prop.getProperty("APPLICATION_ID");
             bootstrapServers = prop.getProperty("BOOTSTRAP_SERVERS");
+            smtpAuth = prop.getProperty("SMTP_AUTH");
+            smtpStartTlsEnable = prop.getProperty("SMTP_START_TLS_ENABLE");
             smtpHost = prop.getProperty("SMTP_HOST");
             smtpPort = prop.getProperty("SMTP_PORT");
             smtpUsername = prop.getProperty("SMTP_USERNAME");
             smtpPassword = prop.getProperty("SMTP_PASSWORD");
-            smtpStartTlsEnable = prop.getProperty("SMTP_START_TLS_ENABLE");
             targetEmail = prop.getProperty("TARGET_EMAIL");
             streamLoginFailsSourceTopic = prop.getProperty("STREAM_LOGIN_FAILS_SOURCE_TOPIC");
             streamLoginFailsOutputTopic = prop.getProperty("STREAM_LOGIN_FAILS_OUTPUT_TOPIC");
