@@ -60,40 +60,4 @@ public class LocalMailService {
         }
     }
 
-    /*public boolean sendMail(String template) {
-        new Thread(() -> {
-            try {
-                Message message = new MimeMessage(session);
-                message.setFrom(new InternetAddress(applicationProperties.getSmtpUsername()));
-                message.setRecipients(Message.RecipientType.TO,
-                        InternetAddress.parse(applicationProperties.getTargetEmail()));
-                message.setSubject("[Gotham Security] Alert Service");
-                message.setContent(template, "text/html; charset=utf-8");
-
-                Transport.send(message);
-                logger.info("An email has been correctly sent to " + applicationProperties.getTargetEmail());
-            } catch (MessagingException e) {
-                throw new RuntimeException(e);
-            }
-        }).start();
-
-        ============================================
-
-        try {
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(applicationProperties.getSmtpUsername()));
-            message.setRecipients(Message.RecipientType.TO,
-                    InternetAddress.parse(applicationProperties.getTargetEmail()));
-            message.setSubject("[Gotham Security] Alert Service");
-            message.setContent(template, "text/html; charset=utf-8");
-
-            Transport.send(message);
-            logger.info("An email has been correctly sent to " + applicationProperties.getTargetEmail());
-            return true;
-        } catch (MessagingException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }*/
-
 }
