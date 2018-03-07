@@ -1,44 +1,67 @@
 package city.gotham.security.services;
 
-import city.gotham.security.ApplicationProperties;
+import city.gotham.security.models.MailData;
+import city.gotham.security.models.MailProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.mail.*;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Properties;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class LocalMailService {
 
-    private static final Logger logger = LoggerFactory.getLogger(LocalMailService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LocalMailService.class);
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(2);
 
-    // Singleton instance
-    private static LocalMailService instance;
+    public static Future<Boolean> asyncSendMail(String template, MailProperties mailProperties, MailData mailData) {
+        return EXECUTOR_SERVICE.submit(() -> {
+            try {
+                Properties props = new Properties();
+                props.put("mail.smtp.auth", "true");
+                props.put("mail.smtp.starttls.enable", mailProperties.getSmtpStartTlsEnable());
+                props.put("mail.smtp.host", mailProperties.getSmtpHost());
+                props.put("mail.smtp.port", mailProperties.getSmtpPort());
 
-    private ApplicationProperties applicationProperties;
-    private Session session;
+                Session session = Session.getInstance(props, new javax.mail.Authenticator() {
 
-    private LocalMailService() {
-        applicationProperties = ApplicationProperties.getInstance();
-
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", applicationProperties.getSmtpStartTlsEnable());
-        props.put("mail.smtp.host", applicationProperties.getSmtpHost());
-        props.put("mail.smtp.port", applicationProperties.getSmtpPort());
-
-        session = Session.getInstance(props,
-                new javax.mail.Authenticator() {
                     protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(applicationProperties.getSmtpUsername(), applicationProperties.getSmtpPassword());
+                        return new PasswordAuthentication(mailProperties.getSmtpUsername(), mailProperties.getSmtpPassword());
                     }
+
                 });
+
+                Message message = new MimeMessage(session);
+                message.setFrom(mailData.getFromInternetAddress());
+                message.setRecipients(Message.RecipientType.TO, mailData.getRecipients());
+                message.setSubject("[Gotham Security] Alert Service");
+                message.setContent(template, "text/html; charset=utf-8");
+
+                Transport.send(message);
+                LOGGER.info("An email has been correctly sent to " + String.join(" ", mailData.getTo()));
+                return true;
+            } catch (MessagingException e) {
+                e.printStackTrace();
+                return false;
+            }
+        });
     }
 
-    public boolean sendMail(String template) {
-        /*new Thread(() -> {
+    public static boolean sendMail(String template, MailProperties mailProperties, MailData mailData) {
+        try {
+            return asyncSendMail(template, mailProperties, mailData).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /*public boolean sendMail(String template) {
+        new Thread(() -> {
             try {
                 Message message = new MimeMessage(session);
                 message.setFrom(new InternetAddress(applicationProperties.getSmtpUsername()));
@@ -52,7 +75,10 @@ public class LocalMailService {
             } catch (MessagingException e) {
                 throw new RuntimeException(e);
             }
-        }).start();*/
+        }).start();
+
+        ============================================
+
         try {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(applicationProperties.getSmtpUsername()));
@@ -68,14 +94,6 @@ public class LocalMailService {
             e.printStackTrace();
             return false;
         }
-    }
-
-    public static LocalMailService getInstance() {
-        if (instance == null) {
-            instance = new LocalMailService();
-        }
-
-        return instance;
-    }
+    }*/
 
 }

@@ -1,37 +1,51 @@
 package city.gotham.security.processors;
 
+import city.gotham.security.ApplicationProperties;
 import city.gotham.security.models.LoginTopicInput;
+import city.gotham.security.models.MailData;
+import city.gotham.security.models.MailProperties;
 import city.gotham.security.services.LocalMailService;
 import org.apache.kafka.streams.processor.AbstractProcessor;
 import org.apache.kafka.streams.processor.ProcessorContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.Future;
+
 public class LoginFailsEmailSenderProcessor extends AbstractProcessor<String, LoginTopicInput> {
 
-    private static final Logger logger = LoggerFactory.getLogger(LoginFailsEmailSenderProcessor.class);
-
     public static final String PROCESSOR_NAME = "LOGIN_FAILS_EMAIL_SENDER_PROCESSOR_NAME";
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoginFailsEmailSenderProcessor.class);
+    private static final ApplicationProperties APPLICATION_PROPERTIES = ApplicationProperties.getInstance();
 
     private ProcessorContext context;
-    private LocalMailService localMailService;
 
     @Override
     @SuppressWarnings("unchecked")
     public void init(ProcessorContext context) {
         this.context = context;
-        localMailService = LocalMailService.getInstance();
     }
 
     @Override
     public void process(String key, LoginTopicInput loginTopicInput) {
-        logger.info("Sending email...");
+        LOGGER.info("Sending email...");
 
         // Send mail with the notification
-        localMailService.sendMail(EMAIL_TEMPLATE
-                .replace("${userId}", loginTopicInput.getUserId())
-                .replace("${logTime}", loginTopicInput.getLogTime())
-                .replace("${ip}", loginTopicInput.getIp()));
+        LocalMailService.asyncSendMail(
+                EMAIL_TEMPLATE
+                        .replace("${userId}", loginTopicInput.getUserId())
+                        .replace("${logTime}", loginTopicInput.getLogTime())
+                        .replace("${ip}", loginTopicInput.getIp()),
+                new MailProperties(
+                        APPLICATION_PROPERTIES.getSmtpAuth(),
+                        APPLICATION_PROPERTIES.getSmtpStartTlsEnable(),
+                        APPLICATION_PROPERTIES.getSmtpHost(),
+                        APPLICATION_PROPERTIES.getSmtpPort(),
+                        APPLICATION_PROPERTIES.getSmtpUsername(),
+                        APPLICATION_PROPERTIES.getSmtpPassword()
+                ),
+                new MailData(APPLICATION_PROPERTIES.getSmtpUsername(), APPLICATION_PROPERTIES.getTargetEmail())
+        );
 
         this.context.forward(key, loginTopicInput);
         this.context.commit();

@@ -13,11 +13,12 @@ public class ApplicationProperties {
     private String bootstrapServers;
 
     // SMTP configuration
+    private String smtpAuth;
+    private String smtpStartTlsEnable;
     private String smtpHost;
     private String smtpPort;
     private String smtpUsername;
     private String smtpPassword;
-    private String smtpStartTlsEnable;
     private String targetEmail;
 
     // Streams
@@ -58,6 +59,14 @@ public class ApplicationProperties {
 
     public void setBootstrapServers(String bootstrapServers) {
         this.bootstrapServers = bootstrapServers;
+    }
+
+    public String getSmtpAuth() {
+        return smtpAuth;
+    }
+
+    public void setSmtpAuth(String smtpAuth) {
+        this.smtpAuth = smtpAuth;
     }
 
     public String getSmtpHost() {
