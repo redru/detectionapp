@@ -18,6 +18,13 @@ public class LocalMailService {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocalMailService.class);
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(2);
 
+    /**
+     * This function send an asynchronous mail and returns a Future that can be consumed by the caller.
+     * @param template
+     * @param mailProperties
+     * @param mailData
+     * @return Future<Boolean>
+     */
     public static Future<Boolean> asyncSendMail(String template, MailProperties mailProperties, MailData mailData) {
         return EXECUTOR_SERVICE.submit(() -> {
             try {
@@ -51,6 +58,13 @@ public class LocalMailService {
         });
     }
 
+    /**
+     * This function returns synchronously after sending an email.
+     * @param template
+     * @param mailProperties
+     * @param mailData
+     * @return boolean
+     */
     public static boolean sendMail(String template, MailProperties mailProperties, MailData mailData) {
         try {
             return asyncSendMail(template, mailProperties, mailData).get();
