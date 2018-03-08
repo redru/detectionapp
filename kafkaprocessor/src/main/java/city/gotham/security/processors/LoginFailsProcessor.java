@@ -12,7 +12,7 @@ public class LoginFailsProcessor extends AbstractProcessor<String, LoginTopicInp
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginFailsProcessor.class);
 
-    public static final int LOGIN_FAILS_LIMIT = 400;
+    public static final int LOGIN_FAILS_LIMIT = 4;
     public static final String PROCESSOR_NAME = "LOGIN_FAILS_PROCESSOR";
     public static final String LOGIN_FAILS_STORE_NAME = "LoginFailsStore";
 

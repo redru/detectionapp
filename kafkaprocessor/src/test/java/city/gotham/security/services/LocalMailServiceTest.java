@@ -44,7 +44,7 @@ public class LocalMailServiceTest {
                 "[Gotham Security] Alert Service"   // Subject
         );
 
-        assertEquals(true, LocalMailService.sendMail(
+        assertTrue(LocalMailService.sendMail(
                 "<span>Test!</span>",
                 mailProperties,
                 mailData
