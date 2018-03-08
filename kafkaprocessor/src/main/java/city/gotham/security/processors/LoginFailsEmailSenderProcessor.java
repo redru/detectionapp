@@ -44,7 +44,11 @@ public class LoginFailsEmailSenderProcessor extends AbstractProcessor<String, Lo
                         APPLICATION_PROPERTIES.getSmtpUsername(),
                         APPLICATION_PROPERTIES.getSmtpPassword()
                 ),
-                new MailData(APPLICATION_PROPERTIES.getSmtpUsername(), APPLICATION_PROPERTIES.getTargetEmail())
+                new MailData(
+                        APPLICATION_PROPERTIES.getSmtpUsername(),   // To
+                        APPLICATION_PROPERTIES.getTargetEmail(),    // From
+                        "[Gotham Security] Alert Service"   // Subject
+                )
         );
 
         this.context.forward(key, loginTopicInput);

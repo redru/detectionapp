@@ -7,14 +7,16 @@ public class MailData {
 
     private String from;
     private String to;
+    private String subject;
 
     public MailData() {
-        this("", "");
+        this("", "", "");
     }
 
-    public MailData(String from, String to) {
+    public MailData(String from, String to, String subject) {
         this.from = from;
         this.to = to;
+        this.subject = subject;
     }
 
     public InternetAddress getFromInternetAddress() {
@@ -49,6 +51,14 @@ public class MailData {
 
     public void setTo(String to) {
         this.to = to;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 
 }

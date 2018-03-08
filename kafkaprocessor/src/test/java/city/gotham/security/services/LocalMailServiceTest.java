@@ -39,8 +39,9 @@ public class LocalMailServiceTest {
         );
 
         MailData mailData = new MailData(
-                APPLICATION_PROPERTIES.getSmtpUsername(),
-                APPLICATION_PROPERTIES.getTargetEmail()
+                APPLICATION_PROPERTIES.getSmtpUsername(),   // To
+                APPLICATION_PROPERTIES.getTargetEmail(),    // From
+                "[Gotham Security] Alert Service"   // Subject
         );
 
         assertEquals(true, LocalMailService.sendMail(

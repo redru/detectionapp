@@ -16,7 +16,11 @@ import java.util.concurrent.Future;
 public class LocalMailService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LocalMailService.class);
-    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(2);
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+    static {
+        LOGGER.debug("Available processors: " + Runtime.getRuntime().availableProcessors());
+    }
 
     /**
      * This function send an asynchronous mail and returns a Future that can be consumed by the caller.
@@ -45,7 +49,7 @@ public class LocalMailService {
                 Message message = new MimeMessage(session);
                 message.setFrom(mailData.getFromInternetAddress());
                 message.setRecipients(Message.RecipientType.TO, mailData.getRecipients());
-                message.setSubject("[Gotham Security] Alert Service");
+                message.setSubject(mailData.getSubject());
                 message.setContent(template, "text/html; charset=utf-8");
 
                 Transport.send(message);
