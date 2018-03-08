@@ -1,51 +1,38 @@
 package city.gotham.security.dags;
 
-import city.gotham.security.ApplicationProperties;
-import city.gotham.security.models.LoginFailureTopicOutput;
 import city.gotham.security.models.LoginTopicInput;
+import city.gotham.security.processors.LoginFailsProcessor;
 import com.github.charithe.kafka.*;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
+import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.streams.processor.ProcessorContext;
+import org.apache.kafka.streams.state.Stores;
 import org.junit.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runners.MethodSorters;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.kafka.support.serializer.JsonDeserializer;
-import org.springframework.kafka.support.serializer.JsonSerializer;
 
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.ExecutionException;
 
-import static org.junit.Assert.*;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @ExtendWith(KafkaJunitExtension.class)
 @KafkaJunitExtensionConfig(startupMode = StartupMode.WAIT_FOR_STARTUP)
 public class LoginFailsDagTest {
 
-    @Rule
-    public KafkaJunitRule kafkaRule = new KafkaJunitRule(EphemeralKafkaBroker.create());
-
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginFailsDagTest.class);
-    private static final ApplicationProperties APPLICATION_PROPERTIES = ApplicationProperties.getInstance();
 
-    private Properties producerProperties = new Properties();
-    private Properties consumerProperties = new Properties();
+    @Mock
+    ProcessorContext processorContext;
+
+    @Rule public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Before
     public void setUp() throws Exception {
-        // Producer Properties
-        producerProperties.put("bootstrap.servers", APPLICATION_PROPERTIES.getBootstrapServers());
 
-        // Consumer Properties
-        consumerProperties.put("bootstrap.servers", APPLICATION_PROPERTIES.getBootstrapServers());
     }
 
     @After
@@ -71,24 +58,29 @@ public class LoginFailsDagTest {
         LOGGER.info("Passed");
     }*/
     @Test
-    public void _0001_consecutiveLoginFails() throws ExecutionException, InterruptedException {
+    public void _0001_consecutiveLoginFails() {
         LOGGER.info("Running LocalMailServiceTest._0001_consecutiveLoginFails() ---> ");
-        Producer<String, LoginTopicInput> producer = kafkaRule.helper().createProducer(new StringSerializer(), new JsonSerializer<>(), producerProperties);
 
-        LoginTopicInput loginTopicInput = new LoginTopicInput();
-        loginTopicInput.setIp("aaa");
-        loginTopicInput.setLogTime(GregorianCalendar.getInstance().toString());
-        loginTopicInput.setStatus("fail");
-        loginTopicInput.setUserId("30");
+        ProcessorContext _context = Mockito.mock(ProcessorContext.class);
 
-        for (int i = 0; i < 4; i++) {
-            producer.send(new ProducerRecord<>(APPLICATION_PROPERTIES.getStreamLoginFailsSourceTopic(), loginTopicInput));
-        }
+        _context.register(
+                Stores.keyValueStoreBuilder(
+                        Stores.persistentKeyValueStore(LoginFailsProcessor.LOGIN_FAILS_STORE_NAME),
+                        Serdes.String(),
+                        Serdes.Integer()
+                ).build(),
+                true,
+                (byte[] var1, byte[] var2) -> {
+                    LOGGER.info(new String(var2));
+                });
 
-        KafkaConsumer<String, LoginFailureTopicOutput> consumer = kafkaRule.helper().createConsumer(new StringDeserializer(), new JsonDeserializer<>(), consumerProperties);
-        List<ConsumerRecord<String, LoginFailureTopicOutput>> result = kafkaRule.helper().consume(APPLICATION_PROPERTIES.getStreamLoginFailsOutputTopic(), consumer, 1).get();
+        LoginTopicInput input = new LoginTopicInput();
+        input.setUserId("30");
 
-        assertEquals(1, result.size());
+        LoginFailsProcessor loginFailsProcessor = new LoginFailsProcessor();
+        loginFailsProcessor.init(_context);
+        loginFailsProcessor.process("", input);
+
         LOGGER.info("Passed");
     }
 
