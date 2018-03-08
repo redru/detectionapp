@@ -6,7 +6,7 @@ import org.apache.kafka.streams.processor.StateStore;
 import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.KeyValueStore;
 
-import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -16,11 +16,15 @@ public class CustomStoreWrapper<K, V> implements KeyValueStore<K, V> {
     private Map<K, V> alternativeStore;
 
     public CustomStoreWrapper() {
-        alternativeStore = new HashMap<>();
+        alternativeStore = new Hashtable<>();
     }
 
     public CustomStoreWrapper(KeyValueStore<K, V> store) {
         this.store = store;
+    }
+
+    public void clear() {
+        alternativeStore.clear();
     }
 
     @Override
@@ -34,36 +38,30 @@ public class CustomStoreWrapper<K, V> implements KeyValueStore<K, V> {
 
     @Override
     public V putIfAbsent(K key, V value) {
-        if (keyValueStoreWasSet()) {
-            store.put(key, value);
-        }
-
-        return value;
+        return keyValueStoreWasSet() ?
+                store.putIfAbsent(key, value) :
+                alternativeStore.putIfAbsent(key, value);
     }
 
     @Override
     public void putAll(List<KeyValue<K, V>> entries) {
         if (keyValueStoreWasSet()) {
             store.putAll(entries);
+        } else {
+            for (KeyValue<K, V> entry : entries) {
+                alternativeStore.put(entry.key, entry.value);
+            }
         }
     }
 
     @Override
     public V delete(K key) {
-        if (keyValueStoreWasSet()) {
-            return store.delete(key);
-        } else {
-            return alternativeStore.remove(key);
-        }
+        return keyValueStoreWasSet() ? store.delete(key) : alternativeStore.remove(key);
     }
 
     @Override
     public String name() {
-        if (keyValueStoreWasSet()) {
-            return store.name();
-        }
-
-        return null;
+        return keyValueStoreWasSet() ? store.name() : null;
     }
 
     @Override
@@ -89,56 +87,32 @@ public class CustomStoreWrapper<K, V> implements KeyValueStore<K, V> {
 
     @Override
     public boolean persistent() {
-        if (keyValueStoreWasSet()) {
-            return store.persistent();
-        }
-
-        return false;
+        return keyValueStoreWasSet() && store.persistent();
     }
 
     @Override
     public boolean isOpen() {
-        if (keyValueStoreWasSet()) {
-            return store.isOpen();
-        }
-
-        return false;
+        return keyValueStoreWasSet() && store.isOpen();
     }
 
     @Override
     public V get(K key) {
-        if (keyValueStoreWasSet()) {
-            return store.get(key);
-        } else {
-            return alternativeStore.get(key);
-        }
+        return keyValueStoreWasSet() ? store.get(key) : alternativeStore.get(key);
     }
 
     @Override
     public KeyValueIterator<K, V> range(K from, K to) {
-        if (keyValueStoreWasSet()) {
-            return store.range(from, to);
-        }
-
-        return null;
+        return keyValueStoreWasSet() ? store.range(from, to) : null;
     }
 
     @Override
     public KeyValueIterator<K, V> all() {
-        if (keyValueStoreWasSet()) {
-            return store.all();
-        }
-
-        return null;
+        return keyValueStoreWasSet() ? store.all() : null;
     }
 
     @Override
     public long approximateNumEntries() {
-        if (keyValueStoreWasSet()) {
-            return store.approximateNumEntries();
-        }
-
-        return 0;
+        return keyValueStoreWasSet() ? store.approximateNumEntries() : 0;
     }
 
     private boolean keyValueStoreWasSet() {

@@ -12,8 +12,7 @@ public class LoginFailsProcessor extends AbstractProcessor<String, LoginTopicInp
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginFailsProcessor.class);
 
-    private static final int LOGIN_FAILS_LIMIT = 4;
-
+    public static final int LOGIN_FAILS_LIMIT = 400;
     public static final String PROCESSOR_NAME = "LOGIN_FAILS_PROCESSOR";
     public static final String LOGIN_FAILS_STORE_NAME = "LoginFailsStore";
 
@@ -45,10 +44,7 @@ public class LoginFailsProcessor extends AbstractProcessor<String, LoginTopicInp
      * @param loginTopicInput
      * @param store
      */
-    public boolean processLogin(
-            LoginTopicInput loginTopicInput,
-            KeyValueStore<String, Integer> store
-    ) {
+    public boolean processLogin(LoginTopicInput loginTopicInput, KeyValueStore<String, Integer> store) {
         boolean mustForward = false;
 
         // Reset user count if loginTopicInput has succeeded
@@ -81,10 +77,7 @@ public class LoginFailsProcessor extends AbstractProcessor<String, LoginTopicInp
      * @param store
      * @return Integer
      */
-    private Integer getUserFailsCountFromStore(
-            LoginTopicInput loginTopicInput,
-            KeyValueStore<String, Integer> store
-    ) {
+    private Integer getUserFailsCountFromStore(LoginTopicInput loginTopicInput, KeyValueStore<String, Integer> store) {
         Integer userCount = store.get(loginTopicInput.getUserId());
 
         return userCount != null ? userCount : 0;
